@@ -1,0 +1,16 @@
+<div [attr.id]="id" *ngIf="gameSvc.initialized">
+    <div class="game-header">
+
+    </div>
+    <div class="game-board">
+        <div *ngFor="let row of gameSvc.rows" class="board-row" [ngClass]="row.rowClass" [style.height.px]="row.tileHeight">
+            <ng-container *ngIf="row.backgroundTileClass">
+                <div *ngFor="let tile of row.tiles" class="board-tile" [ngClass]="row.backgroundTileClass">
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <div class="game-footer">
+
+    </div>
+</div>
