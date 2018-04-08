@@ -4,6 +4,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    position: relative;
     .board-row {
         display: block;
         margin: 0 0 -10px 0;
@@ -15,5 +16,17 @@
             padding: 0;
             box-sizing: border-box;
         }
+    }
+    .frogger-player { 
+        position: absolute;
+    }
+    .frogger-player.facing-right { 
+        transform: rotate(90deg);
+    }
+    .frogger-player.facing-down { 
+        transform: rotate(180deg);
+    }
+    .frogger-player.facing-left { 
+        transform: rotate(270deg);
     }
 }

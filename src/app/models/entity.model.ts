@@ -30,6 +30,21 @@ export interface IEntity {
     gameTick: Function;
 }
 
+export interface IPlayer {
+    entityId: number;
+    playerNumber: number;
+    leftKey: string;
+    rightKey: string;
+    upKey: string;
+    downKey: string;
+    lives: number;
+    startRow: number;
+    startColumn: number;       
+    moveDistance: number;
+    moveDelay: number;
+    moveSpeed: number;
+}
+
 export class Entities { 
     static Frogger = <IEntity>{
         id: Constants.EntityIds.Frogger,

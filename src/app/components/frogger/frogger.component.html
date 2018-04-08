@@ -9,6 +9,10 @@
                 </div>
             </ng-container>
         </div>
+        <div *ngFor="let player of gameSvc.players" class="frogger-player" [class.moving]="player.moving" [class.facing-up]="player.moveDireciton === 'up'"
+            [class.facing-right]="player.moveDireciton === 'right'" [class.facing-down]="player.moveDireciton === 'down'" [class.facing-left]="player.moveDireciton === 'left'"
+            [ngClass]="(player.numberClass + ' ' + player.entity.shape?.cssClass)" [style.left.px]="player.x" [style.top.px]="player.y">
+        </div>
     </div>
     <div class="game-footer">
 

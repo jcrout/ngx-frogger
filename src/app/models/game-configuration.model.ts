@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Constants } from '../constants';
-import { IEntity, Entities } from './entity.model';
+import { IEntity, Entities, IPlayer } from './entity.model';
 import { MoveDirection } from './custom-types.model';
 import { Tile, Tiles } from './tile.model';
 
@@ -9,6 +9,36 @@ export class GameConfiguration {
     entities = <IEntity[]>[
         Entities.Frogger,
         Entities.Car1
+    ];
+    players = <IPlayer[]>[
+        {
+            entityId: Constants.EntityIds.Frogger,
+            playerNumber: 1,
+            leftKey: 'ArrowLeft',
+            rightKey: 'ArrowRight',
+            upKey: 'ArrowUp',
+            downKey: 'ArrowDown',
+            lives: 3,
+            startRow: 0,
+            startColumn: 7,
+            moveDistance: 1,
+            moveSpeed: 2,
+            moveDelay: 1
+        },
+        {
+            entityId: Constants.EntityIds.Frogger,
+            playerNumber: 2,
+            leftKey: 'KeyA',
+            rightKey: 'KeyD',
+            upKey: 'KeyW',
+            downKey: 'KeyS',
+            lives: 3,
+            startRow: 0,
+            startColumn: 8,            
+            moveDistance: 1,
+            moveSpeed: 10,
+            moveDelay: 1
+        }
     ];
     tiles = <Tile[]>[
         Tiles.Path,
@@ -20,6 +50,7 @@ export class GameConfiguration {
     startRow = 0;
     tileSize = 48;
     rowTiles = 14; // 14 rows of 48x48 tiles
+    gameSpeed = 50;
     backgroundColor = 'black';
     gridRows = <RowConfiguration[]>[
         <RowConfiguration>{

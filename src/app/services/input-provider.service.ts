@@ -21,9 +21,10 @@ export class InputProvider implements OnDestroy {
     }
 
     keydownEvent(ev: KeyboardEvent) {  
-        if (ev.code !== 'ArrowRight' && ev.code !== 'ArrowLeft') { 
-            return;
-        }
+        // if (ev.code !== 'ArrowRight' && ev.code !== 'ArrowLeft') { 
+        //     return;
+        // }
+        if (!ev.code) { return };
 
         let inputEvent = new InputEvent();
         inputEvent.type = 'key';
@@ -40,7 +41,7 @@ export class InputProvider implements OnDestroy {
             inputEvent.keyModifiers.push('control');
         }
 
-        console.log(inputEvent);
+        //console.log(inputEvent);
         this.input.emit(inputEvent);
     }
 
