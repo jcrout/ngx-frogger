@@ -8,7 +8,11 @@ import { Tile, Tiles } from './tile.model';
 export class GameConfiguration {
     entities = <IEntity[]>[
         Entities.Frogger,
-        Entities.Car1
+        Entities.Car1,
+        Entities.Car2,
+        Entities.Car3,
+        Entities.Car4,
+        Entities.Car5
     ];
     players = <IPlayer[]>[
         {
@@ -61,70 +65,81 @@ export class GameConfiguration {
             entities: [
                 <RowEntityConfiguration>{
                     entityId: Constants.EntityIds.Car1,
-                    chance: 1.00
+                    chance: .75,
+                    maxOnScreen: 3
+                },
+                <RowEntityConfiguration>{
+                    entityId: Constants.EntityIds.Car2,
+                    chance: .25,
+                    maxOnScreen: 1
                 }
             ],
             rowClass: Constants.RowClasses.Road,
             tileId: Constants.TileIds.Road,
-            entityMinimumSpacing: 5,
-            moveDirection: 'left',
-            entityMoveSpeed: 6,
+            entitySpawnChance: .75,
+            entityMinimumSpacing: 4,
+            entityMoveDirection: 'left',
+            entityMoveSpeed: 20,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
             entities: [
                 <RowEntityConfiguration>{
                     entityId: Constants.EntityIds.Car2,
-                    chance: 1.00
+                    chance: 1.00,
+                    maxOnScreen: 3
                 }
             ],
             rowClass: Constants.RowClasses.Road,
             tileId: Constants.TileIds.Road,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
-            entityMoveSpeed: 6,
+            entityMoveDirection: 'right',
+            entityMoveSpeed: 20,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
             entities: [
                 <RowEntityConfiguration>{
                     entityId: Constants.EntityIds.Car3,
-                    chance: 1.00
+                    chance: 1.00,
+                    maxOnScreen: 3
                 }
             ],
             rowClass: Constants.RowClasses.Road,
             tileId: Constants.TileIds.Road,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
-            entityMoveSpeed: 6,
+            entityMoveDirection: 'left',
+            entityMoveSpeed: 20,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
             entities: [
                 <RowEntityConfiguration>{
                     entityId: Constants.EntityIds.Car4,
-                    chance: 1.00
+                    chance: 1.00,
+                    maxOnScreen: 3
                 }
             ],
             rowClass: Constants.RowClasses.Road,
             tileId: Constants.TileIds.Road,          
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
-            entityMoveSpeed: 6,
+            entityMoveDirection: 'right',
+            entityMoveSpeed: 15,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
             entities: [
                 <RowEntityConfiguration>{
                     entityId: Constants.EntityIds.Car5,
-                    chance: 1.00
+                    chance: 1.00,
+                    maxOnScreen: 3
                 }
             ],
             rowClass: Constants.RowClasses.Road,
             tileId: Constants.TileIds.Road,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
-            entityMoveSpeed: 6,
+            entityMoveDirection: 'left',
+            entityMoveSpeed: 60,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
@@ -135,7 +150,7 @@ export class GameConfiguration {
             rowClass: Constants.RowClasses.Water,
             tileId: Constants.TileIds.Water,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1
         },
@@ -143,7 +158,7 @@ export class GameConfiguration {
             rowClass: Constants.RowClasses.Water,
             tileId: Constants.TileIds.Water,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1
         },
@@ -151,7 +166,7 @@ export class GameConfiguration {
             rowClass: Constants.RowClasses.Water,
             tileId: Constants.TileIds.Water,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1
         },
@@ -159,7 +174,7 @@ export class GameConfiguration {
             rowClass: Constants.RowClasses.Water,
             tileId: Constants.TileIds.Water,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1
         },
@@ -167,14 +182,14 @@ export class GameConfiguration {
             rowClass: Constants.RowClasses.Water,
             tileId: Constants.TileIds.Water,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1
         },
         <RowConfiguration>{
             rowClass: Constants.RowClasses.Goal,
             entityMinimumSpacing: 5,
-            moveDirection: 'left',
+            entityMoveDirection: 'left',
             entityMoveSpeed: 6,
             entityMoveDistance: 1,
             tileId: Constants.TileIds.Goal
@@ -189,6 +204,7 @@ export class RowConfiguration {
     entityMoveDirection?: MoveDirection;
     entityMoveSpeed?: number;
     entityMoveDistance?: number;
+    entitySpawnChance?: number;
     rowClass?: string;
     backgroundImageClass?: string;
     tileId?: number;
@@ -199,5 +215,7 @@ export class RowEntityConfiguration {
     entityId: number;
     maxOnScreen: number;
     chance: number;
-    surfaceEntities: RowEntityConfiguration[]; // snakes on top of logs
+    moveSpeed: number;
+    moveDelay: number;
+    surfaceEntities: RowEntityConfiguration[]; // snakes on top of logs    
 }

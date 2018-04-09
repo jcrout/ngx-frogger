@@ -10,6 +10,7 @@
         margin: 0 0 -10px 0;
         padding: 0 0 10px 0;
         box-sizing: border-box;
+        position: relative;
         .board-tile {
             display: inline-block;
             margin: 0;
@@ -17,16 +18,20 @@
             box-sizing: border-box;
         }
     }
-    .frogger-player { 
+    .frogger-player {
         position: absolute;
     }
-    .frogger-player.facing-right { 
+    .frogger-player.facing-right {
         transform: rotate(90deg);
     }
-    .frogger-player.facing-down { 
+    .frogger-player.facing-down {
         transform: rotate(180deg);
     }
-    .frogger-player.facing-left { 
+    .frogger-player.facing-left {
         transform: rotate(270deg);
+    }
+    .frogger-entity {
+        position: absolute;
+        top: 0;
     }
 }

@@ -8,6 +8,8 @@
                 <div *ngFor="let tile of row.tiles" class="board-tile" [ngClass]="row.backgroundTileClass">
                 </div>
             </ng-container>
+            <div *ngFor="let entity of row.entities" class="frogger-entity" [ngClass]="entity.entity.shape?.cssClass" [style.left.px]="entity.x" [style.top.px]="entity.y">
+            </div>
         </div>
         <div *ngFor="let player of gameSvc.players" class="frogger-player" [class.moving]="player.moving" [class.facing-up]="player.moveDireciton === 'up'"
             [class.facing-right]="player.moveDireciton === 'right'" [class.facing-down]="player.moveDireciton === 'down'" [class.facing-left]="player.moveDireciton === 'left'"

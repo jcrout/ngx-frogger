@@ -20,13 +20,14 @@ export class GameClockService {
 
             const currentTime = Date.now();
             const dt = currentTime - expected; // the drift (positive for overshooting)
-            if (dt > this.interval) {
+            if (dt > that.interval) {
+                console.log('bb');
                 // something really bad happened. Maybe the browser (tab) was inactive?
                 // possibly special handling to avoid futile "catch up" run
             }
 
-            expected += this.interval;
-            setTimeout(step, Math.max(0, this.interval - dt)); // take into account drift
+            expected += that.interval;
+            setTimeout(step, Math.max(0, that.interval - dt)); // take into account drift
         }
     }
 }

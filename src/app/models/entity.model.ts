@@ -60,6 +60,39 @@ export class Entities {
             cssClass: 'entity-car1',
             width: 42,
             height: 36
+        },
+        moveSpeed: 6
+    };
+    static Car2 = <IEntity>{ 
+        id: Constants.EntityIds.Car2,
+        shape: {
+            cssClass: 'entity-car2',
+            width: 42,
+            height: 36
+        }
+    };
+    static Car3 = <IEntity>{ 
+        id: Constants.EntityIds.Car3,
+        shape: {
+            cssClass: 'entity-car3',
+            width: 42,
+            height: 36
+        }
+    };
+    static Car4 = <IEntity>{ 
+        id: Constants.EntityIds.Car4,
+        shape: {
+            cssClass: 'entity-car4',
+            width: 42,
+            height: 36
+        }
+    };
+    static Car5 = <IEntity>{ 
+        id: Constants.EntityIds.Car5,
+        shape: {
+            cssClass: 'entity-car5',
+            width: 42,
+            height: 30
         }
     };
 }

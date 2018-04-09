@@ -9,20 +9,6 @@ import { IEntity, IPlayer } from '../models/entity.model';
 import { EntityFactory } from '../factories/entity.factory';
 import { Tile } from '../models/tile.model';
 
-export interface GameRow {
-  entities?: IEntity[];
-  entityMinimumSpacing?: number; // unit: 1 entity width, must be calculated
-  entityMoveDirection?: MoveDirection;
-  entityMoveSpeed?: number;
-  entityMoveDistance?: number;
-  rowClass?: string;
-  backgroundTileClass?: string;
-  backgroundImageClass?: string;
-  tiles: any[];
-  tileWidth: number;
-  tileHeight: number;
-}
-
 export interface GamePlayer {
   player: IPlayer;
   entity: IEntity;
@@ -37,6 +23,35 @@ export interface GamePlayer {
   moving: boolean;
   moveStart?: number;
   numberClass: string;
+}
+
+export interface GameEntity {
+  entity: IEntity;
+  config: RowEntityConfiguration;
+  x: number;
+  y: number;
+  bufferX: number;
+  bufferY: number;
+  moveDireciton: MoveDirection;
+  moveSpeed: number;
+  moveInterval: number;
+  moveDelay: number;
+  moveDistance: number;
+}
+
+export interface GameRow {
+  config: RowConfiguration;
+  entities?: GameEntity[];
+  entityMinimumSpacing?: number; // unit: 1 entity width, must be calculated
+  entityMoveDirection?: MoveDirection;
+  entityMoveSpeed?: number;
+  entityMoveDistance?: number;
+  rowClass?: string;
+  backgroundTileClass?: string;
+  backgroundImageClass?: string;
+  tiles: any[];
+  tileWidth: number;
+  tileHeight: number;
 }
 
 @Injectable()
@@ -54,7 +69,8 @@ export class GameService {
     private styleSvc: DynamicStyleService,
     private entityFactory: EntityFactory,
     private inputProvider: InputProvider,
-    private clockSvc: GameClockService) { }
+    private clockSvc: GameClockService,
+    private randomSvc: RandomService) { }
 
   private getTileHeight(config: GameConfiguration, row: RowConfiguration) {
     if (row.tileId) {
@@ -65,6 +81,7 @@ export class GameService {
   }
 
   initialize(id: string, config: GameConfiguration) {
+    const that = this;
     this.config = config;
 
     let tileLookup = {};
@@ -94,6 +111,9 @@ export class GameService {
       { property: 'width', value: config.tileSize + 'px' },
       { property: 'height', value: config.tileSize + 'px' }
     ]);
+    this.styleSvc.upsertStyles('.game-board .board-row .frogger-entity', [
+      { property: 'transition', value: 'left ' + config.gameSpeed + 'ms linear' }
+    ]);
     for (let i = 0; i < config.tiles.length; i++) {
       let tile = config.tiles[i];
       if (tile.cssClass) {
@@ -113,7 +133,6 @@ export class GameService {
     // }, 2000);
 
     this.entityFactory.initialize(config.entities);
-    this.clockSvc.interval = config.gameSpeed;
     this.players = config.players.map(p => {
       let entity = config.entities.find(e => e.id === p.entityId);
       let player = <GamePlayer>{
@@ -125,7 +144,7 @@ export class GameService {
         moveDireciton: 'up'
       };
       player.x = p.startColumn * config.tileSize + player.bufferX,
-      player.y = (config.gridRows.length - p.startRow) * config.tileSize - player.bufferY;
+        player.y = (config.gridRows.length - p.startRow) * config.tileSize - player.bufferY;
       player.moveDelay = p.moveDelay * config.gameSpeed;
       player.moveSpeed = p.moveSpeed * config.gameSpeed;
       player.moveSpeedTotal = player.moveSpeed + player.moveDelay;
@@ -135,7 +154,7 @@ export class GameService {
       return player;
     });
 
-    this.rows = config.gridRows.map(gr => {
+    this.rows = config.gridRows.map((gr, i) => {
       let tile = gr.tileId ? config.tiles.find(t => t.id === gr.tileId) : <Tile>{ id: -1, width: config.tileSize, height: config.tileSize };
       let tileCount = Math.floor(boardWidth / tile.width);
       let tiles = [];
@@ -143,20 +162,98 @@ export class GameService {
         tiles.push(i);
       }
 
+      let boardRowNumberClass = 'board-row-' + i.toString();
       let newRow = <GameRow>{
-        rowClass: gr.rowClass,
+        config: gr,
+        rowClass: boardRowNumberClass + ' ' + gr.rowClass,
         tiles: tiles,
         tileHeight: tile.height + 10,
         tileWidth: tile.width,
-        backgroundTileClass: tile.cssClass
+        backgroundTileClass: tile.cssClass,
+        entities: []
       };
+
+      // if (gr.entities && gr.entities.length > 0) {
+      //   let entityMoveSpeed = gr.entityMoveSpeed * config.gameSpeed
+      //   that.styleSvc.upsertStyles('.game-board .' + boardRowNumberClass + ' .frogger-entity', [
+      //     { property: 'transition', value: 'left ' + entityMoveSpeed + 'ms linear, right ' + entityMoveSpeed + 'ms linear' }
+      //   ]);
+      // }
 
       return newRow;
     });
 
     this.rows.reverse();
     this.inputProvider.input.subscribe(this.inputReceived.bind(this));
+    this.clockSvc.interval = config.gameSpeed;
+    this.clockSvc.tick.subscribe(this.gameLoop.bind(this));
+    this.clockSvc.start();
     this.initialized = true;
+  }
+
+  gameLoop() {
+    const that = this;
+    this.rows.forEach((r, i) => {
+      that.spawnEntities(i, r);
+      r.entities.forEach(e => {
+        e.moveInterval++;
+        if (e.moveInterval >= e.moveSpeed) { // movement finished
+          e.moveInterval = 0;
+        }
+
+
+        if (e.moveInterval == 0) {
+          
+        }
+        e.x += e.moveDireciton === 'left' ? e.moveDistance * -1 : e.moveDistance;
+      });
+    });
+
+
+  }
+
+  spawnEntities(index: number, row: GameRow) {
+    const config = row.config;
+    if (!config.entities || config.entities.length === 0) { return; }
+
+    let entityCount = row.entities.length;
+    let hasMultipleTypes = config.entities.length > 1;
+    if (entityCount === 0) { // initial spawn
+      let entityToSpawn = this.chooseEntity(config);
+      let entity = this.config.entities.find(e => e.id === entityToSpawn.entityId);
+      let minX = config.entityMoveDirection === 'left' ? 0 : entity.shape.width;
+      let maxX = config.entityMoveDirection === 'left' ? this.boardWidth + entity.shape.width : this.boardWidth;
+      let randX = this.randomSvc.getInteger(maxX, minX);
+      let newEntity = <GameEntity>{
+        entity: entity,
+        bufferX: (this.config.tileSize - (entity.shape.width % this.config.tileSize)) / 2,
+        bufferY: (this.config.tileSize - (entity.shape.height % this.config.tileSize)) / 2,
+        moveSpeed: config.entityMoveSpeed,
+        moveDireciton: config.entityMoveDirection || 'left',
+        moveDelay: entityToSpawn.moveDelay || 0,
+        moveInterval: -1,
+        moveDistance: this.config.tileSize / config.entityMoveSpeed
+      };
+      newEntity.x = randX - (randX % this.config.tileSize);
+      newEntity.y = newEntity.bufferY;
+      row.entities.push(newEntity);
+    } else {
+
+    }
+  }
+
+  chooseEntity(config: RowConfiguration): RowEntityConfiguration {
+    const rand = this.randomSvc.getFraction();
+    let target = 0;
+    for (let i = 0; i < config.entities.length; i++) {
+      let configEntity = config.entities[i];
+      target += configEntity.chance;
+      if (rand >= target && rand <= target + configEntity.chance) {
+        return configEntity;
+      }
+    }
+
+    return config.entities[0];
   }
 
   inputReceived(ev: InputEvent) {
@@ -173,20 +270,20 @@ export class GameService {
 
   movePlayer(gamePlayer: GamePlayer, key: string) {
     let currentDate = Date.now();
-    if (gamePlayer.moveStart && (currentDate - gamePlayer.moveStart < gamePlayer.moveSpeedTotal)) { 
+    if (gamePlayer.moveStart && (currentDate - gamePlayer.moveStart < gamePlayer.moveSpeedTotal)) {
       return;
     }
 
-    let xChange = 
+    let xChange =
       key === gamePlayer.player.leftKey ? gamePlayer.player.moveDistance * this.config.tileSize * -1 :
-      key === gamePlayer.player.rightKey ? gamePlayer.player.moveDistance * this.config.tileSize : 0;
-    let yChange = 
+        key === gamePlayer.player.rightKey ? gamePlayer.player.moveDistance * this.config.tileSize : 0;
+    let yChange =
       key === gamePlayer.player.upKey ? gamePlayer.player.moveDistance * this.config.tileSize * -1 :
-      key === gamePlayer.player.downKey ? gamePlayer.player.moveDistance * this.config.tileSize : 0;
-    let newX =  Math.max(gamePlayer.bufferX, Math.min(this.boardEffectiveWidth + gamePlayer.bufferX, gamePlayer.x + xChange));
-    let newY =  Math.max(gamePlayer.bufferY, Math.min(this.boardEffectiveHeight + gamePlayer.bufferY, gamePlayer.y + yChange));
+        key === gamePlayer.player.downKey ? gamePlayer.player.moveDistance * this.config.tileSize : 0;
+    let newX = Math.max(gamePlayer.bufferX, Math.min(this.boardEffectiveWidth + gamePlayer.bufferX, gamePlayer.x + xChange));
+    let newY = Math.max(gamePlayer.bufferY, Math.min(this.boardEffectiveHeight + gamePlayer.bufferY, gamePlayer.y + yChange));
 
-    if (gamePlayer.x !== newX || gamePlayer.y !== newY) { 
+    if (gamePlayer.x !== newX || gamePlayer.y !== newY) {
       gamePlayer.x = newX;
       gamePlayer.y = newY;
       gamePlayer.moving = true;

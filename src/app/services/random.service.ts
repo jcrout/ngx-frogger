@@ -13,4 +13,8 @@ export class RandomService {
       return Math.floor(Math.random() * max);
     }    
   }
+
+  getFraction(max?: number, min?: number) { 
+    return Math.random();   
+  }
 }
